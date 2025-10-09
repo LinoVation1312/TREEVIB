@@ -9,7 +9,7 @@ from scipy.io import wavfile
 
 plt.close('all')
 
-def bandpass_dc_lp(x, fs, f_hp=0.01, f_lp=0.5, hp_taps=10001, lp_order=4):
+def bandpass_dc_lp(x, fs, f_hp=0.01, f_lp=0.5, hp_taps=10001, lp_order=2):
 
     nyq = 0.5 * fs
 
@@ -60,12 +60,10 @@ fs=1000;
 t=np.arange(N)/fs;
 
 fc = 0.5
+f_dc=0.05
 
 
-b, a = butter(N=4, Wn=fc/(fs/2), btype='low') 
-
-
-data_bp = bandpass_dc_lp(data, fs=fs, f_hp=0.05, f_lp=0.75)
+data_bp = bandpass_dc_lp(data, fs=fs, f_hp=f_dc, f_lp=fc)
 
 
 
@@ -73,14 +71,14 @@ Y = fft(data)
 f = fftfreq(N, 1/fs)  # axe fréquence en Hz
 
 plt.figure(figsize=(10,6))
-plt.subplot(2,1,1)
+plt.subplot(2,2,1)
 plt.plot(t, data)
 plt.title(f"{group_name} - {channel_name} (signal brut)")
 plt.xlabel("Time [s]")
 plt.ylabel("Acc. [m/s²]")
 plt.grid(True)
 
-plt.subplot(2,1,2)
+plt.subplot(2,2,2)
 plt.plot(f[:N//2], 2.0/N * np.abs(Y[:N//2]))  # FFT positive seulement
 plt.title("FFT (amplitude)")
 plt.xlabel("Frequency [Hz]")
@@ -94,15 +92,14 @@ plt.xlim(0, 1)
 # --- FFT du signal filtré ---
 Yf = fft(data_bp)
 
-plt.figure(figsize=(10,6))
-plt.subplot(2,1,1)
+plt.subplot(2,2,3)
 plt.plot(t, data_bp)
 plt.title(f"{group_name} - {channel_name} (signal filtré)")
 plt.xlabel("Time [s]")
 plt.ylabel("Acc. [m/s²]")
 plt.grid(True)
 
-plt.subplot(2,1,2)
+plt.subplot(2,2,4)
 plt.plot(f[:N//2], 2.0/N * np.abs(Yf[:N//2]))
 plt.title("FFT (filtré)")
 plt.xlabel("Frequency [Hz]")
